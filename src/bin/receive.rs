@@ -1,3 +1,5 @@
+#![feature(termination_trait, process_exitcode_placeholder)]
+
 extern crate integer_encoding;
 extern crate crc;
 extern crate byteorder;
@@ -20,7 +22,7 @@ use std::env;
 use std::fs::{self, File};
 use std::io::{self, Read, Write, BufWriter};
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, ExitCode};
 
 type Result<T> = std::result::Result<T, failure::Error>;
 
@@ -32,12 +34,13 @@ fn no_command() {
   eprintln!("Bye!");
 }
 
-fn main() {
+fn main() -> ExitCode {
   let config_path = match env::args().nth(1) {
     Some(c) => c,
     None => {
       eprintln!("{}! Travis SSH Deploy isn't set up right.", expletive());
       eprintln!("I don't know where to find the config file!");
+      return ExitCode::FAILURE;
     }
   };
 
@@ -46,6 +49,7 @@ fn main() {
     Err(e) => {
       eprintln!("{}! I couldn't open up the config file. Here's what I know:", expletive());
       eprintln!("{}", e);
+      return ExitCode::FAILURE;
     }
   };
 
@@ -54,6 +58,7 @@ fn main() {
     Err(e) => {
       eprintln!("{}! I couldn't parse the config file. Here's what I know:", expletive());
       eprintln!("{}", e);
+      return ExitCode::FAILURE;
     }
   };
 
@@ -61,7 +66,7 @@ fn main() {
     Ok(c) => c,
     Err(_) => {
       no_command();
-      return;
+      return ExitCode::FAILURE;
     }
   };
 
@@ -71,7 +76,7 @@ fn main() {
     .collect();
   if parts.is_empty() {
     no_command();
-    return;
+    return ExitCode::FAILURE;
   }
   let command = &parts[0];
   let params = &parts[1..];
@@ -87,7 +92,10 @@ fn main() {
   if let Err(e) = res {
     eprintln!("{}! Something went wrong. Here's what I know.", expletive());
     eprintln!("{}", e);
+    return ExitCode::FAILURE;
   }
+
+  ExitCode::SUCCESS
 }
 
 fn deploy(config: &Config, params: &[&str]) -> Result<()> {

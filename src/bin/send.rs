@@ -1,3 +1,5 @@
+#![feature(termination_trait, process_exitcode_placeholder)]
+
 extern crate integer_encoding;
 extern crate crc;
 extern crate byteorder;
@@ -9,12 +11,18 @@ use integer_encoding::VarIntWriter;
 
 use std::env;
 use std::fs::File;
+use std::process::ExitCode;
 use std::io::{self, Read, Write};
 
 type Result<T> = std::result::Result<T, failure::Error>;
 
-fn main() {
-  inner().unwrap();
+fn main() -> ExitCode {
+  if let Err(e) = inner() {
+    eprintln!("Dang! An error occurred. Here's the info:");
+    eprintln!("{}", e);
+    return ExitCode::FAILURE;
+  }
+  ExitCode::SUCCESS
 }
 
 fn inner() -> Result<()> {
