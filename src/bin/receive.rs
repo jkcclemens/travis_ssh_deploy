@@ -25,38 +25,35 @@ use std::process::Command;
 type Result<T> = std::result::Result<T, failure::Error>;
 
 fn no_command() {
-  println!("Howdy. This is Travis SSH Deploy.");
-  println!("You can't SSH in to a shell, but you can provide me with a command!");
-  println!("Check the documentation for more information.");
-  println!();
-  println!("Bye!");
+  eprintln!("Howdy. This is Travis SSH Deploy.");
+  eprintln!("You can't SSH in to a shell, but you can provide me with a command!");
+  eprintln!("Check the documentation for more information.");
+  eprintln!();
+  eprintln!("Bye!");
 }
 
 fn main() {
   let config_path = match env::args().nth(1) {
     Some(c) => c,
     None => {
-      println!("Whoops! Travis SSH Deploy isn't set up right.");
-      println!("I don't know where to find the config file!");
-      return;
+      eprintln!("{}! Travis SSH Deploy isn't set up right.", expletive());
+      eprintln!("I don't know where to find the config file!");
     }
   };
 
   let f = match File::open(config_path) {
     Ok(f) => f,
     Err(e) => {
-      println!("Uh-oh! I couldn't open up the config file. Here's what I know:");
-      println!("{}", e);
-      return;
+      eprintln!("{}! I couldn't open up the config file. Here's what I know:", expletive());
+      eprintln!("{}", e);
     }
   };
 
   let config: Config = match serde_yaml::from_reader(f) {
     Ok(c) => c,
     Err(e) => {
-      println!("Shoot! I couldn't parse the config file. Here's what I know:");
-      println!("{}", e);
-      return;
+      eprintln!("{}! I couldn't parse the config file. Here's what I know:", expletive());
+      eprintln!("{}", e);
     }
   };
 
@@ -82,14 +79,14 @@ fn main() {
   let res = match *command {
     "deploy" => deploy(&config, &params),
     x => {
-      println!("I'm not sure what to do with \"{}\"", x);
-      return;
+      eprintln!("{}! I'm not sure what to do with \"{}\"", expletive(), x);
+      return ExitCode::FAILURE;
     }
   };
 
   if let Err(e) = res {
-    println!("Hey, so something went wrong. Here's what I know.");
-    println!("{}", e);
+    eprintln!("{}! Something went wrong. Here's what I know.", expletive());
+    eprintln!("{}", e);
   }
 }
 
@@ -97,15 +94,15 @@ fn deploy(config: &Config, params: &[&str]) -> Result<()> {
   println!("Executing a deploy plan!");
 
   if params.is_empty() {
-    println!("You didn't tell me what plan we're working on!");
-    println!("Usage: deploy [plan]");
+    eprintln!("{}! You didn't tell me what plan we're working on!", expletive());
+    eprintln!("Usage: deploy [plan]");
     return Ok(());
   }
 
   let plan = match config.plans.get(params[0]) {
     Some(p) => p,
     None => {
-      println!("I couldn't find any plan called {}. :(", params[0]);
+      eprintln!("{}! I couldn't find any plan called {}. :(", expletive(),params[0]);
       return Ok(());
     }
   };
