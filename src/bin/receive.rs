@@ -366,5 +366,5 @@ fn expletive() -> &'static str {
     "Ah, phooey",
     "Uh-oh"
   ];
-  thread_rng().choose(EXPLETIVE_DELETED).unwrap()
+  thread_rng().choose(EXPLETIVE_DELETED).unwrap_or(&"Shoot")
 }
