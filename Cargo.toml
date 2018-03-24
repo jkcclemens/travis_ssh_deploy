@@ -1,0 +1,20 @@
+[package]
+name = "travis_ssh_deploy"
+version = "0.1.0"
+authors = ["Kyle Clemens <me@kyleclemens.com>"]
+
+[dependencies]
+# varint
+integer-encoding = "1"
+# crc32
+crc = "1"
+# big-endian writing
+byteorder = "1"
+# errors
+failure = "0.1"
+# temporary directories and files
+tempdir = "0.3"
+# config parsing
+serde = "1"
+serde_yaml = "0.7"
+serde_derive = "1"

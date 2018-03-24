@@ -1,0 +1,52 @@
+# (required) deploy plans
+plans:
+  # an example deploy plan
+  example:
+      # (optional) the working directory of this plan
+      # if specified, any file that isn't a full path will be placed here during the move_files step
+      working_directory: /home/kyle/example
+      # (optional) a map of file renames
+      # if a file is received with the name "file_local" it will be renamed "file_remote"
+      # note that both local and remote names can be full paths
+      files:
+        file_local: file_remote
+      # (optional) the files that are expected
+      # this can also be an integer describing the number of files expected if names are not static
+      # this can be omitted and no checks will be done
+      expected_files:
+        - file_local
+        - another_file.html
+        - my_last_file.json
+      # (required) the steps to take during the deploy process
+      # this can be a command (see below) or a built-in step
+      # built-in steps:
+      #   receive_files: consume the rest of the input and store the files in a temporary directory
+      #   move_files: move the files out of the temporary directory and into their destinations
+      # commands:
+      #   commands will use the PATH environment variable of the shell that the receiver was spawned
+      #   with
+      #   if working_directory is set, the command will be spawned in that directory
+      #   if receive_files has been run prior to this command, the TRAVIS_DEPLOY_TEMPDIR environment
+      #   variable will be available
+      steps:
+        - type: receive_files
+
+          # (required) name of the command
+        - type: command
+          command: supervisord
+          # (optional) arguments to pass to the command
+          args:
+            - -c
+            - /home/kyle/.config/supervisord.conf
+            - stop
+            - example
+          # (optional) whether to allow failure
+          # this is false by default
+          # if true, the deploy process won't stop if the command returns a non-zero exit code
+          allow_failure: false
+
+        - type: move_files
+
+        - type: command
+          command: supervisord
+          args: [-c, /home/kyle/.config/supervisord.conf, start, example]

@@ -1,0 +1,24 @@
+MAGIC
+VERSION
+NUM_FILES
+[
+  COMPRESSION
+  NAME_LENGTH FILE_NAME
+  CRC32
+  FILE_LENGTH FILE_BYTES
+]...
+
+MAGIC       = 0xFEEDBEEF
+VERSION     = one byte: version of the protocol. this document describes version 0x02
+NUM_FILES   = varint: number of files being sent
+[
+  COMPRESSION = one byte
+                  0x00 = no compression
+                  0x01 = xz
+                  0x02 = gzip
+  NAME_LENGTH = varint: length of FILE_NAME, max 512
+  FILE_NAME   = utf-8 string: name of the file
+  CRC32       = four bytes: the crc32 (IEEE) of FILE_BYTES
+  FILE_LENGTH = varint: length of FILE_BYTES, max 104,857,600
+  FILE_BYTES  = FILE_LENGTH bytes: content of the file
+]...
