@@ -84,7 +84,7 @@ fn main() -> ExitCode {
   let params = &parts[1..];
 
   let res = match *command {
-    "deploy" => deploy(&config, &params),
+    "deploy" => deploy(&config, params),
     x => {
       eprintln!("{}! I'm not sure what to do with \"{}\"", expletive(), x);
       return ExitCode::FAILURE;
