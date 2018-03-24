@@ -271,9 +271,6 @@ fn command(state: &mut PlanState, cc: &ConfigCommand) -> Result<()> {
   if let Some(ref tmp) = state.tmp {
     command.env("TRAVIS_DEPLOY_TEMPDIR", tmp.path().to_string_lossy().to_string());
   }
-  if let Ok(path) = env::var("PATH") {
-    command.env("PATH", path);
-  }
 
   if !command.status()?.success() && !cc.allow_failure {
     bail!("Command {} exited with a non-zero status code", cc.command);
