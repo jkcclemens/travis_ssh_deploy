@@ -10,10 +10,12 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_yaml;
+extern crate rand;
 
 use byteorder::{BigEndian, ReadBytesExt};
 use crc::{crc32, Hasher32};
 use integer_encoding::VarIntReader;
+use rand::{thread_rng, Rng};
 use tempdir::TempDir;
 
 use std::borrow::Cow;
@@ -351,4 +353,18 @@ impl Step {
       ))
     }
   }
+}
+
+fn expletive() -> &'static str {
+  const EXPLETIVE_DELETED: &[&str] = &[
+    "Darn",
+    "Shoot",
+    "Whoops",
+    "Oops",
+    "Rats",
+    "Oh no",
+    "Ah, phooey",
+    "Uh-oh"
+  ];
+  thread_rng().choose(EXPLETIVE_DELETED).unwrap()
 }

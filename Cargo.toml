@@ -18,3 +18,5 @@ tempdir = "0.3"
 serde = "1"
 serde_yaml = "0.7"
 serde_derive = "1"
+# expletives
+rand = "0.4"
